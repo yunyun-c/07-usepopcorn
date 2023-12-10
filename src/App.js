@@ -54,7 +54,7 @@ const average = (arr) =>
 const KEY = "10b20922";
 
 export default function App() {
-  const [query, setQuery] = useState("sleeping beauty");
+  const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -76,6 +76,14 @@ export default function App() {
   function handleDeleteWatched(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
+
+  useEffect(function () {
+    document.addEventListener("keydown", function (e) {
+      if (e.code === "Escape") {
+        handleCloseMovie();
+      }
+    });
+  }, []);
 
   useEffect(
     function () {
@@ -114,7 +122,7 @@ export default function App() {
         setError("");
         return;
       }
-
+      handleCloseMovie();
       fetchMovies();
 
       return function () {
@@ -328,6 +336,23 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     onAddWatched(newWatchedMovie);
     onCloseMovie();
   }
+
+  useEffect(
+    function () {
+      function callback(e) {
+        if (e.code === "Escape") {
+          onCloseMovie();
+        }
+      }
+
+      document.addEventListener("keydown", callback);
+
+      return function () {
+        document.removeEventListener("keydown", callback);
+      };
+    },
+    [onCloseMovie]
+  );
 
   useEffect(
     function () {
